@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .menu-container {
+            width: 300px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .menu-container h2 {
+            text-align: center;
+        }
+        .menu-options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .menu-options li {
+            margin-bottom: 10px;
+        }
+        .menu-options li a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .menu-options li a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu-container">
+        <h2>Menu</h2>
+        <ul class="menu-options">
+            <li><a href="/self">View Self Record</a></li>
+            <li><a href="/deleteAccount">Delete Account</a></li>
+            <li><a href="/updateCustomer">Update Account</a></li>
+            <li><a href="/deposit">Deposit</a></li>
+            <li><a href="/withdraw">Withdraw</a></li>
+            <li><a href="/welcome">Logout</a></li>
+        </ul>
+    </div>
+</body>
+</html>
