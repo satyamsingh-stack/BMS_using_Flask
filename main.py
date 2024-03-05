@@ -260,5 +260,20 @@ def deposit():
     else:
         return render_template("deposit.html")
 
+@app.route("/confirmDelete", methods=["GET", "POST"])
+def confirmDelete():
+    return render_template("confirmDelete.html")
+
+@app.route("/deleteConfirmed", methods=["Get","POST"])
+def deleteConfirmed():
+    user_id = session.get("user_id")
+    if user_id:
+        cur.execute("DELETE FROM User WHERE user_id = ?", (user_id,))
+        conn.commit()
+        session.pop("user_id")  # Clear the session after account deletion
+        return "Your account has been successfully deleted."
+    else:
+        return "User not logged in."
+
 if __name__ == "__main__":
     app.run(debug=True)
