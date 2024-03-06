@@ -2,6 +2,7 @@ from flask import Flask, render_template, url_for, request, redirect, session
 import sqlite3
 import random
 import re
+import hashlib
 import threading
 conn = sqlite3.connect('Bank_Database.db', check_same_thread=False)
 cur = conn.cursor()
@@ -62,6 +63,8 @@ def customerRegistration():
             return render_template("customerRegistration.html", error="Invalid Age")
         if not (passwordPattern.match(password)):
             return render_template("customerRegistration.html", error="Invalid Password")
+        
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         balance = 1000.00
         num = random.random()
@@ -70,7 +73,7 @@ def customerRegistration():
         accNo = 11110000 + num2
         
         cur.execute("INSERT INTO User (SSN, first, last, age, city, gender, email, user_id, password, accNo, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (SSN, first, last, age, city, gender, email, user_id, password, accNo, balance))
+                    (SSN, first, last, age, city, gender, email, user_id, hashed_password, accNo, balance))
         
         conn.commit()
         
@@ -160,9 +163,9 @@ def customerLogin():
 def customerDash():
     user_id = request.form["user_id"]
     password = request.form["password"]
-    
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     # Check if user ID exists in the database and if the password matches
-    cur.execute("SELECT * FROM User WHERE user_id = ? AND password = ?", (user_id, password))
+    cur.execute("SELECT * FROM User WHERE user_id = ? AND password = ?", (user_id, hashed_password))
     admin = cur.fetchone()
     if admin:
         session["user_id"] = user_id # Store user ID in session
