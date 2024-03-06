@@ -26,17 +26,26 @@ def adminDash():
         password = request.form['password']
         cur.execute('''SELECT user_id FROM Admin''')
         user_id2 = cur.fetchall()
+        failed_login_attempts = session.get('failed_login_attempts', 0)
         for i in user_id2:
             if user_id == i[0]:
                 cur.execute('''SELECT password FROM Admin WHERE user_id = ?''', (user_id,))
                 password2 = cur.fetchone()[0]
                 if password == password2:
                     session['user_id'] = user_id
+                    session.pop('failed_login_attempts', None)  # Reset failed login attempts
                     return render_template("adminDash.html")
                 else:
-                    return "Invalid ID and Password"
+                    failed_login_attempts += 1
+                    session['failed_login_attempts'] = failed_login_attempts
+                    if failed_login_attempts >= 3:
+                        session.pop('failed_login_attempts', None)  # Reset failed login attempts
+                        return redirect(url_for('welcome'))
+                    else:
+                        return "Invalid ID and Password"
         # Moved this return statement outside the loop
         return "Invalid User Id And Password"
+    return render_template('adminlogin.html')
 passwordPattern = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$')
 @app.route("/customerRegistration", methods=['GET', 'POST'])
 def customerRegistration():
