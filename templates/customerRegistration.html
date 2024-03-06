@@ -1,46 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Customer Registration</title>
-    <style>
-        /* Your CSS styles here */
-    </style>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/customerRegistration.css') }}" />
 </head>
 <body>
-    <div class="registration-container">
-        <h2>Customer Registration</h2>
-        <form class="registration-form" action="/customerRegistration" method="post">
-            <label for="ssnid">SSN ID:</label>
-            <input type="text" id="ssnid" name="ssnid" required><br><br>
+    <nav id="nav1">
+        <img id="logo" src="/static/images/logo.png" alt="wait">
+        <button id="logoutbtn" onclick="window.location.href='/welcome'">Logout</button>
+    </nav>
 
-            <label for="first_name">First Name:</label>
-            <input type="text" id="first_name" name="first_name" required><br><br>
+    <h1>Customer Registration</h1>
+    <hr>
 
-            <label for="last_name">Last Name:</label>
-            <input type="text" id="last_name" name="last_name" required><br><br>
+    <button style="background-color: #4CAF50; color:white;margin-top: 11px; font-size: large; margin-bottom: 23px; width: 150px; height: 35px; border: white; border-radius: 5px;" onclick="window.location.href='/adminDash'">Dashboard</button>
 
-            <label for="age">Age:</label>
-            <input type="number" id="age" name="age" required><br><br>
+    <form id="inpu" action="/customerRegistration" method="post">
+        <label for="f1">First Name:</label>
+        <input required type="text" id="f1" name="first_name">
+        
+        <label id="l1">Last Name:</label>
+        <input type="text" id="l1" required name="last_name">
 
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br><br>
+        <label for="u1">Username:</label>
+        <input type="text" id="u1" name="user_id" required>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br><br>
+        <label for="p1">Password:</label>
+        <input type="password" id="p1" name="password" required>
 
-            <label for="city">City:</label>
-            <input type="text" id="city" name="city" required><br><br>
+        <label for="g1">Gender:</label>
+        <select id="g1" name="gender" required>
+            <option value="">Please select one...</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="other">Other</option>
+            <option value="Prefer not to answer">Prefer not to Answer</option>
+        </select>
 
-            <label for="gender">Gender:</label>
-            <input type="text" id="gender" name="gender" required><br><br>
+        <label id="c1">City:</label>
+        <input type="text" id="c1" name="city" required>
 
-            <label for="user_id">User ID:</label>
-            <input type="text" id="user_id" name="user_id" required><br><br>
+        <label for="a1">Age:</label>
+        <input type="number" id="a1" name="age" required>
 
-            <button type="submit">Register</button>
-        </form>
-    </div>
+        <label for="id1">SSN ID:</label>
+        <input type="number" id="id1" name="ssnid" required>
+
+        <label id="e1">Email:</label>
+        <input type="email" id="e1" name="email" required>
+
+        <button id="btn1" type="submit" onclick="validateForm()">Create</button>
+    </form>
+
+    <script>
+        function validateForm() {
+            var firstName = document.getElementById("f1").value;
+            var lastName = document.getElementById("l1").value;
+            var username = document.getElementById("u1").value;
+            var password = document.getElementById("p1").value;
+            var gender = document.getElementById("g1").value;
+            var city = document.getElementById("c1").value;
+            var age = document.getElementById("a1").value;
+            var ssnId = document.getElementById("id1").value;
+            var email = document.getElementById("e1").value;
+
+            // Check if all fields are filled
+            if (firstName === "" || lastName === "" || username === "" || password === "" || gender === "" || city === "" || age === "" || ssnId === "" || email === "") {
+                alert("Please fill in all fields.");
+                return false;
+            }
+
+            // Add more validation rules as needed
+            else{
+                alert("Account Created Sucessfully")
+            }
+             // Form submission will proceed if all fields are filled
+        }
+    </script>
 </body>
 </html>

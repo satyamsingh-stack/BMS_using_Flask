@@ -1,0 +1,95 @@
+#nav1 {
+    display: flex;
+}
+
+#logoutbtn {
+    color: white;
+    margin-top: 34px;
+    height: 32px;
+    margin-left: 72%;
+    font-size: large;
+    background-color: #4CAF50;
+    border-radius: 5px;
+    width: 100px;
+}
+
+#btn1 {
+    font-size: medium;
+    color: white;
+    background-color: #4CAF50;
+    margin-left: 51%;
+    margin-top: -20%;
+    width: 77px;
+    height: 34px;
+    border-radius: 5px;
+}
+
+#inpu {
+    font-size: larger;
+    font-family: cursive;
+    display: flex;
+    flex-direction: column;
+    margin-right: 10%;
+    margin-left: 4%;
+    margin-top: 2%;
+}
+
+#f1 {
+    margin-bottom: 23px;
+    width: fit-content;
+}
+
+#l1 {
+    margin-bottom: 23px;
+    width: fit-content;
+    margin-left: 23%;
+    margin-top: -6.1%;
+}
+
+#u1 {
+    margin-bottom: 23px;
+    width: fit-content;
+}
+
+#p1 {
+    margin-left: 23%;
+    margin-bottom: 23px;
+    width: fit-content;
+}
+
+#g1 {
+    margin-bottom: 23px;
+    width: 176px;
+    height: 24px;
+}
+
+#c1 {
+    margin-top: -6.2%;
+    margin-left: 23%;
+    margin-bottom: 23px;
+}
+
+#a1 {
+    margin-bottom: 23px;
+    width: fit-content;
+}
+
+#id1 {
+    width: fit-content;
+    margin-left: 23%;
+    margin-top: -5.9%;
+}
+
+#id2 {
+    margin-left: 23%;
+    width: fit-content;
+}
+
+#e1 {
+    width: fit-content;
+    margin-top: 214px;
+}
+
+#e12 {
+    width: fit-content;
+}
