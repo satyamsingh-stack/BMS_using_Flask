@@ -1,6 +1,7 @@
 from flask import Flask, render_template, url_for, request, redirect, session
 import sqlite3
 import random
+import re
 import threading
 conn = sqlite3.connect('Bank_Database.db', check_same_thread=False)
 cur = conn.cursor()
@@ -35,6 +36,7 @@ def adminDash():
                     return "Invalid ID and Password"
         # Moved this return statement outside the loop
         return "Invalid User Id And Password"
+passwordPattern = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$')
 @app.route("/customerRegistration", methods=['GET', 'POST'])
 def customerRegistration():
     if request.method == 'POST':
@@ -47,6 +49,20 @@ def customerRegistration():
         email = request.form['email']
         user_id = request.form['user_id']
         password = request.form['password']
+
+        if not (SSN.isdigit() and len(SSN) == 5):
+            return render_template("customerRegistration.html", error="Invalid SSN ID")
+        if not (first.isalpha() and len(first) <= 10):
+            return render_template("customerRegistration.html", error="Invalid First Name")
+        if not (last.isalpha() and len(last) <= 10):
+            return render_template("customerRegistration.html", error="Invalid Last Name")
+        if not (city.isalpha() and len(city) <= 10):
+            return render_template("customerRegistration.html", error="Invalid City")
+        if not (age.isdigit() and 1 <= int(age) <= 100):
+            return render_template("customerRegistration.html", error="Invalid Age")
+        if not (passwordPattern.match(password)):
+            return render_template("customerRegistration.html", error="Invalid Password")
+
         balance = 1000.00
         num = random.random()
         num1 = num * 10000
