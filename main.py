@@ -144,13 +144,14 @@ def update_account():
     if request.method == "POST":
         account_number = request.form.get("account_number")
         new_password = request.form.get("new_password")
-        if account_number and new_password:
+        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+        if account_number and hashed_password:
             # Check if account number exists in the database
             cur.execute("SELECT * FROM User WHERE accNo = ?", (account_number,))
             account = cur.fetchone()
             if account:
                 # Update password in the database
-                cur.execute("UPDATE User SET password = ? WHERE accNo = ?", (new_password, account_number))
+                cur.execute("UPDATE User SET password = ? WHERE accNo = ?", (hashed_password, account_number))
                 conn.commit()
                 return redirect(url_for("password_updated"))
             else:
@@ -173,15 +174,25 @@ def customerDash():
     user_id = request.form["user_id"]
     password = request.form["password"]
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
+    
     # Check if user ID exists in the database and if the password matches
     cur.execute("SELECT * FROM User WHERE user_id = ? AND password = ?", (user_id, hashed_password))
     admin = cur.fetchone()
+    
     if admin:
         session["user_id"] = user_id # Store user ID in session
-        # return redirect(url_for("customerDash"))
+        session.pop('failed_login_attempts', None)  # Reset failed login attempts
         return render_template('customerDash.html')
     else:
-        return "Invalid credentials. Please try again."
+        failed_login_attempts = session.get('failed_login_attempts', 0)
+        failed_login_attempts += 1
+        session['failed_login_attempts'] = failed_login_attempts
+        
+        if failed_login_attempts >= 3:
+            session.pop('failed_login_attempts', None)  # Reset failed login attempts
+            return redirect(url_for('welcome'))  # Redirect to welcome page after 3 failed attempts
+        else:
+            return "Invalid credentials. Please try again."
 
 @app.route("/self")
 def self():
@@ -207,13 +218,13 @@ def updateCustomer():
             password = request.form.get("password")
             city = request.form.get("city")
             age = request.form.get("age")
-            
-            if first_name and last_name and password and city and age:
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            if first_name and last_name and hashed_password and city and age:
                 conn = sqlite3.connect('Bank_Database.db')
                 cur = conn.cursor()
                 # Update customer's information in the database
                 cur.execute("UPDATE User SET first = ?, last = ?, password = ?, city = ?, age = ? WHERE user_id = ?",
-                            (first_name, last_name, password, city, age, user_id))
+                            (first_name, last_name, hashed_password, city, age, user_id))
                 conn.commit()
                 conn.close()
                 return "Information updated successfully."
