@@ -1,6 +1,8 @@
 from flask import Flask, render_template, url_for, request, redirect, session
 import sqlite3
 import random
+import re
+import hashlib
 import threading
 conn = sqlite3.connect('Bank_Database.db', check_same_thread=False)
 cur = conn.cursor()
@@ -24,17 +26,27 @@ def adminDash():
         password = request.form['password']
         cur.execute('''SELECT user_id FROM Admin''')
         user_id2 = cur.fetchall()
+        failed_login_attempts = session.get('failed_login_attempts', 0)
         for i in user_id2:
             if user_id == i[0]:
                 cur.execute('''SELECT password FROM Admin WHERE user_id = ?''', (user_id,))
                 password2 = cur.fetchone()[0]
                 if password == password2:
                     session['user_id'] = user_id
+                    session.pop('failed_login_attempts', None)  # Reset failed login attempts
                     return render_template("adminDash.html")
                 else:
-                    return "Invalid ID and Password"
+                    failed_login_attempts += 1
+                    session['failed_login_attempts'] = failed_login_attempts
+                    if failed_login_attempts >= 3:
+                        session.pop('failed_login_attempts', None)  # Reset failed login attempts
+                        return redirect(url_for('welcome'))
+                    else:
+                        return "Invalid ID and Password"
         # Moved this return statement outside the loop
         return "Invalid User Id And Password"
+    return render_template('adminlogin.html')
+passwordPattern = re.compile(r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$')
 @app.route("/customerRegistration", methods=['GET', 'POST'])
 def customerRegistration():
     if request.method == 'POST':
@@ -47,6 +59,22 @@ def customerRegistration():
         email = request.form['email']
         user_id = request.form['user_id']
         password = request.form['password']
+
+        if not (SSN.isdigit() and len(SSN) == 5):
+            return render_template("customerRegistration.html", error="Invalid SSN ID")
+        if not (first.isalpha() and len(first) <= 10):
+            return render_template("customerRegistration.html", error="Invalid First Name")
+        if not (last.isalpha() and len(last) <= 10):
+            return render_template("customerRegistration.html", error="Invalid Last Name")
+        if not (city.isalpha() and len(city) <= 10):
+            return render_template("customerRegistration.html", error="Invalid City")
+        if not (age.isdigit() and 1 <= int(age) <= 100):
+            return render_template("customerRegistration.html", error="Invalid Age")
+        if not (passwordPattern.match(password)):
+            return render_template("customerRegistration.html", error="Invalid Password")
+        
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
         balance = 1000.00
         num = random.random()
         num1 = num * 10000
@@ -54,7 +82,7 @@ def customerRegistration():
         accNo = 11110000 + num2
         
         cur.execute("INSERT INTO User (SSN, first, last, age, city, gender, email, user_id, password, accNo, balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    (SSN, first, last, age, city, gender, email, user_id, password, accNo, balance))
+                    (SSN, first, last, age, city, gender, email, user_id, hashed_password, accNo, balance))
         
         conn.commit()
         
@@ -116,13 +144,14 @@ def update_account():
     if request.method == "POST":
         account_number = request.form.get("account_number")
         new_password = request.form.get("new_password")
-        if account_number and new_password:
+        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
+        if account_number and hashed_password:
             # Check if account number exists in the database
             cur.execute("SELECT * FROM User WHERE accNo = ?", (account_number,))
             account = cur.fetchone()
             if account:
                 # Update password in the database
-                cur.execute("UPDATE User SET password = ? WHERE accNo = ?", (new_password, account_number))
+                cur.execute("UPDATE User SET password = ? WHERE accNo = ?", (hashed_password, account_number))
                 conn.commit()
                 return redirect(url_for("password_updated"))
             else:
@@ -144,16 +173,26 @@ def customerLogin():
 def customerDash():
     user_id = request.form["user_id"]
     password = request.form["password"]
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
     
     # Check if user ID exists in the database and if the password matches
-    cur.execute("SELECT * FROM User WHERE user_id = ? AND password = ?", (user_id, password))
+    cur.execute("SELECT * FROM User WHERE user_id = ? AND password = ?", (user_id, hashed_password))
     admin = cur.fetchone()
+    
     if admin:
         session["user_id"] = user_id # Store user ID in session
-        # return redirect(url_for("customerDash"))
+        session.pop('failed_login_attempts', None)  # Reset failed login attempts
         return render_template('customerDash.html')
     else:
-        return "Invalid credentials. Please try again."
+        failed_login_attempts = session.get('failed_login_attempts', 0)
+        failed_login_attempts += 1
+        session['failed_login_attempts'] = failed_login_attempts
+        
+        if failed_login_attempts >= 3:
+            session.pop('failed_login_attempts', None)  # Reset failed login attempts
+            return redirect(url_for('welcome'))  # Redirect to welcome page after 3 failed attempts
+        else:
+            return "Invalid credentials. Please try again."
 
 @app.route("/self")
 def self():
@@ -179,13 +218,13 @@ def updateCustomer():
             password = request.form.get("password")
             city = request.form.get("city")
             age = request.form.get("age")
-            
-            if first_name and last_name and password and city and age:
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
+            if first_name and last_name and hashed_password and city and age:
                 conn = sqlite3.connect('Bank_Database.db')
                 cur = conn.cursor()
                 # Update customer's information in the database
                 cur.execute("UPDATE User SET first = ?, last = ?, password = ?, city = ?, age = ? WHERE user_id = ?",
-                            (first_name, last_name, password, city, age, user_id))
+                            (first_name, last_name, hashed_password, city, age, user_id))
                 conn.commit()
                 conn.close()
                 return "Information updated successfully."

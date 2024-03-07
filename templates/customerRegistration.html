@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Registration</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/customerRegistration.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/customerRegistration.css') }}">
 </head>
 <body>
     <nav id="nav1">
@@ -20,8 +20,7 @@
     <form id="inpu" action="/customerRegistration" method="post">
         <label for="f1">First Name:</label>
         <input required type="text" id="f1" name="first_name">
-        
-        <label id="l1">Last Name:</label>
+        <label for="l1">Last Name:</label>
         <input type="text" id="l1" required name="last_name">
 
         <label for="u1">Username:</label>
@@ -39,7 +38,7 @@
             <option value="Prefer not to answer">Prefer not to Answer</option>
         </select>
 
-        <label id="c1">City:</label>
+        <label for="c1">City:</label>
         <input type="text" id="c1" name="city" required>
 
         <label for="a1">Age:</label>
@@ -48,23 +47,22 @@
         <label for="id1">SSN ID:</label>
         <input type="number" id="id1" name="ssnid" required>
 
-        <label id="e1">Email:</label>
+        <label for="e1">Email:</label>
         <input type="email" id="e1" name="email" required>
 
         <button id="btn1" type="submit" onclick="validateForm()">Create</button>
     </form>
-
     <script>
         function validateForm() {
-            var firstName = document.getElementById("f1").value;
-            var lastName = document.getElementById("l1").value;
-            var username = document.getElementById("u1").value;
-            var password = document.getElementById("p1").value;
-            var gender = document.getElementById("g1").value;
-            var city = document.getElementById("c1").value;
-            var age = document.getElementById("a1").value;
-            var ssnId = document.getElementById("id1").value;
-            var email = document.getElementById("e1").value;
+            var firstName = document.getElementById("f1").value.trim();
+            var lastName = document.getElementById("l1").value.trim();
+            var username = document.getElementById("u1").value.trim();
+            var password = document.getElementById("p1").value.trim();
+            var gender = document.getElementById("g1").value.trim();
+            var city = document.getElementById("c1").value.trim();
+            var age = document.getElementById("a1").value.trim();
+            var ssnId = document.getElementById("id1").value.trim();
+            var email = document.getElementById("e1").value.trim();
 
             // Check if all fields are filled
             if (firstName === "" || lastName === "" || username === "" || password === "" || gender === "" || city === "" || age === "" || ssnId === "" || email === "") {
@@ -72,12 +70,59 @@
                 return false;
             }
 
-            // Add more validation rules as needed
-            else{
-                alert("Account Created Sucessfully")
+            // Validate First Name (Alphabets only with max length 10)
+            var namePattern = /^[A-Za-z]{1,10}$/;
+            if (!namePattern.test(firstName)) {
+                alert("First Name must contain alphabets only and have a maximum length of 10 characters.");
+                return false;
             }
-             // Form submission will proceed if all fields are filled
-        }
-    </script>
+
+            // Validate Last Name (Alphabets only with max length 10)
+            if (!namePattern.test(lastName)) {
+                alert("Last Name must contain alphabets only and have a maximum length of 10 characters.");
+                return false;
+            }
+
+            // Validate Username (Alphabets, numbers with max length 10)
+            var usernamePattern = /^[A-Za-z0-9]{1,10}$/;
+            if (!usernamePattern.test(username)) {
+                alert("Username must contain alphabets and numbers only and have a maximum length of 10 characters.");
+                return false;
+            }
+
+            // Validate Password (At least one alphabet, one
+             // Validate Password (At least one alphabet, one number, one special character, minimum length 8)
+             var passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+             if (!passwordPattern.test(password)) {
+                 alert("Password must contain at least one alphabet, one number, one special character, and have a minimum length of 8 characters.");
+                 return false;
+             }
+ 
+             // Validate City (Alphabets only with max length 10)
+             if (!namePattern.test(city)) {
+                 alert("City must contain alphabets only and have a maximum length of 10 characters.");
+                 return false;
+             }
+ 
+             // Validate Age (Number between 1 and 100)
+             if (isNaN(age) || age < 1 || age > 100) {
+                 alert("Age must be a number between 1 and 100.");
+                 return false;
+             }
+ 
+             // Validate SSN ID (Number with length 5)
+             var ssnPattern = /^\d{5}$/;
+             if (!ssnPattern.test(ssnId)) {
+                 alert("SSN ID must be a number of length 5.");
+                 return false;
+             }
+ 
+             // Add more validation rules as needed
+             else {
+                 alert("Account Created Successfully");
+             }
+             // Form submission will proceed if all fields are filled and validated
+         }
+     </script>
 </body>
 </html>
